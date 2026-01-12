@@ -42,7 +42,7 @@ modules:
         - hyprlock
         - hyprpolkitagent
         - hyprtoolkit
-        - qt6ct-kde
+        #- qt6ct-kde
         - hyprqt6engine
         - hyprland-qt-support
         - hyprland-guiutils
