@@ -3,43 +3,90 @@
 # image will be published to ghcr.io/<user>/<name>
 name: bazzite-hyprland
 # description will be included in the image's metadata
-description: This is my personal OS image.
+description: Hyprland image based off of Bazzite
 
 # the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 42 # latest is also supported if you want new updates ASAP
+base-image: ghcr.io/ublue-os/bazzite-gnome
+image-version: latest
 
-# module configuration, executed in order
-# you can include multiple instances of the same module
 modules:
+  - type: dnf
+    repos:
+      cleanup: true
+      copr:
+        - atim/starship # Starship
+        - sdegler/hyprland # Hyprland
+        - avengemedia/dms # DMS
+      files:
+        - vscodium.repo
+    install:
+      packages:
+        # Sys Utils
+        - btop
+        - micro
+        - cargo
+        - clamav
+        - clamav-update
+        - clamd
+
+        # CLI
+        - kitty
+        - zsh
+        - fish
+        - starship
+
+        # Hyprland
+        - hyprland
+        - hyprcursor
+        - hypridle
+        - hyprlock
+        - hyprpolkitagent
+        - hyprtoolkit
+        - qt6ct-kde
+        - hyprqt6engine
+        - hyprland-qt-support
+        - hyprland-guiutils
+
+        # Shell
+        - kvantum
+        - dms
+        
+        # Games
+        - gamescope
+
+        # Dev
+        - codium
+        - typescript
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
+        - lutris
+        - ptyxis
+        
+  - type: default-flatpaks
+    configurations:
+      - notify: false
+        scope: system
+        install:
+          - com.github.tchx84.Flatseal
+      - notify: false
+        scope: user
+        install:
+          # General
+          - md.obsidian.Obsidian
+          - com.vivaldi.Vivaldi
+          - com.spotify.Client
+          - com.discordapp.Discord
+          # Games
+          - com.heroicgameslauncher.hgl
+          # System
+          - com.github.Matoking.protontricks
+  
   - type: files
     files:
       - source: system
-        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+        destination: /
 
-  - type: dnf
-    repos:
-      copr:
-        - atim/starship
-    install:
-      packages:
-        - micro
-        - starship
-    remove:
-      packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
-        - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
-
-  - type: default-flatpaks
-    configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
-        scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
-          - org.mozilla.firefox
-          - org.gnome.Loupe
-      - scope: user # Also add Flathub user repo, but no user packages
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
